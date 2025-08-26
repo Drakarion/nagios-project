@@ -1,0 +1,2 @@
+nagios_admin_user: nagiosadmin
+nagios_admin_password: "kaizen123"   # для htpasswd

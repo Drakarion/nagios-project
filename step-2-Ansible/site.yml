@@ -1,0 +1,57 @@
+- name: Install & configure Nagios4 on Ubuntu 22.04
+  hosts: nagios
+  become: yes
+
+  pre_tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+  tasks:
+    - name: Install Nagios and dependencies
+      apt:
+        name:
+          - apache2
+          - apache2-utils       # здесь лежит бинарь htpasswd
+          - nagios4
+          - nagios-nrpe-plugin
+        state: present
+
+    - name: Enable CGI module for Apache
+      command: a2enmod cgi
+      args:
+        creates: /etc/apache2/mods-enabled/cgi.load
+      notify: Restart Apache
+
+    # заменяем community.general.htpasswd на безопасный CLI-вызов
+    - name: Create/Update Nagios admin user via htpasswd CLI (idempotent)
+      shell: |
+        set -e
+        FILE=/etc/nagios4/htpasswd.users
+        USER='{{ nagios_admin_user | default("nagiosadmin") }}'
+        PASS='{{ nagios_admin_password | default("ChangeMe123!") }}'
+
+        if [ ! -f "$FILE" ]; then
+          printf '%s\n' "$PASS" | htpasswd -ci "$FILE" "$USER"
+        else
+          printf '%s\n' "$PASS" | htpasswd -i "$FILE" "$USER"
+        fi
+      args:
+        executable: /bin/bash
+      no_log: true   # чтобы пароль не светился в логах
+
+    - name: Enable and start Apache and Nagios services
+      systemd:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      loop:
+        - apache2
+        - nagios4
+
+  handlers:
+    - name: Restart Apache
+      systemd:
+        name: apache2
+        state: restarted

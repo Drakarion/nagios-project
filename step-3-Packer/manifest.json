@@ -1,0 +1,14 @@
+{
+  "builds": [
+    {
+      "name": "ubuntu_nagios",
+      "builder_type": "amazon-ebs",
+      "build_time": 1756197523,
+      "files": null,
+      "artifact_id": "us-east-1:ami-0d098d078f615d2c2",
+      "packer_run_uuid": "908be2d2-b39a-1bb4-ff3e-7cba00b089ab",
+      "custom_data": null
+    }
+  ],
+  "last_run_uuid": "908be2d2-b39a-1bb4-ff3e-7cba00b089ab"
+}
