@@ -1,12 +1,32 @@
 - name: Install & configure Nagios4 on Ubuntu 22.04
-  hosts: nagios
+  hosts: all
   become: yes
 
   pre_tasks:
-    - name: Update apt cache
-      apt:
+    - name: Enable universe repo
+      ansible.builtin.command: add-apt-repository universe -y
+      args:
+        creates: /etc/apt/sources.list.d/universe.list
+
+    - name: Ensure sane apt sources for Ubuntu 22.04 (jammy)
+      ansible.builtin.copy:
+        dest: /etc/apt/sources.list
+        mode: '0644'
+        content: |
+          deb http://archive.ubuntu.com/ubuntu jammy main restricted universe multiverse
+          deb http://archive.ubuntu.com/ubuntu jammy-updates main restricted universe multiverse
+          deb http://archive.ubuntu.com/ubuntu jammy-backports main restricted universe multiverse
+          deb http://security.ubuntu.com/ubuntu jammy-security main restricted universe multiverse
+      when: ansible_distribution_release == 'jammy'
+
+    - name: apt clean
+      ansible.builtin.command: apt-get clean
+      changed_when: false
+
+    - name: Update apt cache (fresh)
+      ansible.builtin.apt:
         update_cache: yes
-        cache_valid_time: 3600
+        cache_valid_time: 0
 
   tasks:
     - name: Install Nagios and dependencies
@@ -40,6 +60,17 @@
       args:
         executable: /bin/bash
       no_log: true   # чтобы пароль не светился в логах
+
+    - name: Allow access to Nagios (replace 'Require valid-user' -> 'Require all granted')
+      ansible.builtin.replace:
+        path: /etc/apache2/conf-available/nagios4-cgi.conf
+        regexp: 'Require\s+valid-user'
+        replace: 'Require all granted'
+      notify: Restart Apache
+
+    - name: Validate Apache config
+      ansible.builtin.command: apache2ctl -t
+      changed_when: false
 
     - name: Enable and start Apache and Nagios services
       systemd:
