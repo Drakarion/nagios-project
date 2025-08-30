@@ -1,0 +1,70 @@
+# 1) Установить Nagios + веб-интерфейс + Apache
+- name: Install Nagios server + web UI + Apache
+  apt:
+    name:
+      - nagios4
+      - nagios4-cgi
+      - apache2
+      - apache2-utils
+    state: present
+    update_cache: yes
+    force_apt_get: yes
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+# 2) Включить нужные модули Apache
+- name: Enable required Apache modules (fallback)
+  command: a2enmod {{ item }}
+  args:
+    creates: /etc/apache2/mods-enabled/{{ item }}.load
+  loop:
+    - alias
+    - mime
+    - cgi
+    - rewrite
+  notify: Reload Apache
+
+# 3) Включить пакетный конфиг Nagios (там уже есть Alias/ScriptAlias)
+- name: Enable nagios4-cgi Apache conf
+  command: a2enconf nagios4-cgi
+  args:
+    creates: /etc/apache2/conf-enabled/nagios4-cgi.conf
+  notify: Reload Apache
+
+# 4) Снять “Permission Denied” — открываем доступ без пароля
+#    (меняем все Require ... в конфиге nagios4-cgi.conf)
+- name: Relax access rule in /etc/apache2/conf-available/nagios4-cgi.conf
+  replace:
+    path: /etc/apache2/conf-available/nagios4-cgi.conf
+    regexp: '^\s*Require\s+.*'
+    replace: "    Require {{ nagios_ip_access | default('all granted') }}"
+  notify: Reload Apache
+
+# 5) На случай, если в /etc/nagios4/apache2.conf остались BasicAuth — перезапишем правила
+- name: Override /etc/nagios4/apache2.conf Directory rules (no auth)
+  blockinfile:
+    path: /etc/nagios4/apache2.conf
+    marker: "# {mark} MANAGED BY ANSIBLE (nagios access)"
+    block: |
+      <Directory "/usr/share/nagios4/htdocs">
+          Options FollowSymLinks
+          AllowOverride None
+          Require {{ nagios_ip_access | default('all granted') }}
+      </Directory>
+
+      <Directory "/usr/lib/cgi-bin/nagios4">
+          Options ExecCGI
+          AllowOverride None
+          Require {{ nagios_ip_access | default('all granted') }}
+      </Directory>
+  notify: Reload Apache
+
+# 6) Запустить сервисы
+- name: Ensure services are running
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  loop:
+    - apache2
+    - nagios4

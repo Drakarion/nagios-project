@@ -1,0 +1,20 @@
+- name: Install Apache
+  apt:
+    name:
+      - apache2
+      - apache2-utils
+    state: present
+    update_cache: yes
+
+- name: Enable required Apache modules (no community.general)
+  command: a2enmod {{ item }}
+  args:
+    creates: /etc/apache2/mods-enabled/{{ item }}.load
+  loop: "{{ apache_modules }}"
+  notify: Reload Apache
+
+- name: Ensure Apache running and enabled
+  service:
+    name: "{{ apache_service }}"
+    state: started
+    enabled: yes

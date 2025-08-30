@@ -1,0 +1,6 @@
+apache_service: apache2
+apache_modules:
+  - alias
+  - mime
+  - rewrite
+  - cgi

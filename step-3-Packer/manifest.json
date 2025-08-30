@@ -44,7 +44,61 @@
       "artifact_id": "us-east-1:ami-053335d1e0fe05f06",
       "packer_run_uuid": "be18c6d7-ef54-31cd-b6e8-e980040cee1b",
       "custom_data": null
+    },
+    {
+      "name": "ubuntu_nagios",
+      "builder_type": "amazon-ebs",
+      "build_time": 1756528591,
+      "files": null,
+      "artifact_id": "us-east-1:ami-096c1ad0b6d9baa50",
+      "packer_run_uuid": "ae7d2b84-baff-42de-810f-733f2e8b8188",
+      "custom_data": null
+    },
+    {
+      "name": "ubuntu_nagios",
+      "builder_type": "amazon-ebs",
+      "build_time": 1756529566,
+      "files": null,
+      "artifact_id": "us-east-1:ami-015978fce9bbc0846",
+      "packer_run_uuid": "e30d60f6-ae5f-1a28-5ced-35d4f3c710d0",
+      "custom_data": null
+    },
+    {
+      "name": "ubuntu_nagios",
+      "builder_type": "amazon-ebs",
+      "build_time": 1756531002,
+      "files": null,
+      "artifact_id": "us-east-1:ami-0fa865d44a820c110",
+      "packer_run_uuid": "afbb8667-607f-8142-9053-b9d990d28d83",
+      "custom_data": null
+    },
+    {
+      "name": "ubuntu_nagios",
+      "builder_type": "amazon-ebs",
+      "build_time": 1756531348,
+      "files": null,
+      "artifact_id": "us-east-1:ami-001c1d70465161e5b",
+      "packer_run_uuid": "261b55cd-8db8-10ec-5776-d4b8b968b85b",
+      "custom_data": null
+    },
+    {
+      "name": "ubuntu_nagios",
+      "builder_type": "amazon-ebs",
+      "build_time": 1756532049,
+      "files": null,
+      "artifact_id": "us-east-1:ami-0cf7583c4d46407d1",
+      "packer_run_uuid": "1ecbe8b9-a138-eb2b-4af4-cd842dde9e5b",
+      "custom_data": null
+    },
+    {
+      "name": "ubuntu_nagios",
+      "builder_type": "amazon-ebs",
+      "build_time": 1756538780,
+      "files": null,
+      "artifact_id": "us-east-1:ami-0ae6bf65865393a1f",
+      "packer_run_uuid": "26263a8e-f167-6bdc-01eb-a242588d3f54",
+      "custom_data": null
     }
   ],
-  "last_run_uuid": "be18c6d7-ef54-31cd-b6e8-e980040cee1b"
+  "last_run_uuid": "26263a8e-f167-6bdc-01eb-a242588d3f54"
 }

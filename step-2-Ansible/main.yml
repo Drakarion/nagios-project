@@ -1,0 +1,19 @@
+- name: Deploy Nagios Core with open access (no Permission Denied)
+  hosts: all
+  become: yes
+
+  pre_tasks:
+    - name: Make sure apt is sane (cache + universe + dist-upgrade)
+      ansible.builtin.shell: |
+        set -e
+        rm -rf /var/lib/apt/lists/*
+        apt-get update -y
+        apt-get install -y software-properties-common
+        add-apt-repository -y universe
+        apt-get update -y
+        DEBIAN_FRONTEND=noninteractive apt-get -y dist-upgrade
+      args: { executable: /bin/bash }
+
+  roles:
+    - apache
+    - nagios
